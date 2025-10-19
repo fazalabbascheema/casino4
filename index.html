@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>3 Patti Crown Demo with Referral</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #121212; color: #eee; text-align: center; padding: 20px; }
+  #referral-section, #game-ui { margin-top: 30px; }
+  input[type=text], input[type=number], button {
+    padding: 10px; font-size: 16px; border-radius: 5px; border: none; 
+  }
+  input[type=text], input[type=number] {
+    width: 200px; margin-right: 10px;
+  }
+  button {
+    cursor: pointer; background: #333; color: #eee;
+  }
+  button:hover {
+    background: #555;
+  }
+  #balance {
+    font-size: 24px; margin: 15px 0;
+  }
+  #referral-message, #result {
+    margin-top: 10px; font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<h1>3 Patti Crown Demo (Referral Required)</h1>
+
+<div id="referral-section">
+  <label for="referral-code">Enter Referral Code to get ₹1000 free:</label><br/>
+  <input type="text" id="referral-code" placeholder="Enter referral code" />
+  <button onclick="checkReferral()">Submit</button>
+  <div id="referral-message"></div>
+  <p>Valid referral codes: <b>UPERCHAT, DEMO123, FREE1000</b></p>
+</div>
+
+<div id="game-ui" style="display:none;">
+  <div id="balance">Balance: ₹0</div>
+
+  <label for="bet-amount">Place your bet (₹): </label>
+  <input type="number" id="bet-amount" min="10" step="10" value="10" />
+  <button onclick="playGame()">Play</button>
+
+  <div id="result"></div>
+</div>
+
+<script>
+  const validReferralCodes = ['UPERCHAT', 'DEMO123', 'FREE1000'];
+  let balance = 0;
+
+  function updateBalance() {
+    document.getElementById('balance').textContent = `Balance: ₹${balance}`;
+  }
+
+  function checkReferral() {
+    const inputCode = document.getElementById('referral-code').value.trim().toUpperCase();
+    const msgDiv = document.getElementById('referral-message');
+
+    if(inputCode === '') {
+      msgDiv.style.color = '#ff4444';
+      msgDiv.textContent = 'Referral code is required.';
+      return;
+    }
+    if(validReferralCodes.includes(inputCode)) {
+      msgDiv.style.color = '#00ff00';
+      msgDiv.textContent = 'Referral code accepted! You got ₹1000 free to play. Enjoy the game.';
+      document.getElementById('referral-section').style.display = 'none';
+      document.getElementById('game-ui').style.display = 'block';
+      balance = 1000;
+      updateBalance();
+    } else {
+      msgDiv.style.color = '#ff4444';
+      msgDiv.textContent = 'Invalid referral code. Please try again.';
+    }
+  }
+
+  function playGame() {
+    const betInput = document.getElementById('bet-amount');
+    const bet = Number(betInput.value);
+    const resultDiv = document.getElementById('result');
+
+    if(isNaN(bet) || bet <= 0) {
+      resultDiv.style.color = '#ff4444';
+      resultDiv.textContent = 'Please enter a valid bet amount.';
+      return;
+    }
+    if(bet > balance) {
+      resultDiv.style.color = '#ff4444';
+      resultDiv.textContent = 'Insufficient balance to place this bet.';
+      return;
+    }
+
+    // Simple 50% win chance demo logic
+    const win = Math.random() < 0.5;
+
+    if(win) {
+      balance += bet;
+      resultDiv.style.color = '#00ff00';
+      resultDiv.textContent = `You won! ₹${bet} added to your balance.`;
+    } else {
+      balance -= bet;
+      resultDiv.style.color = '#ff4444';
+      resultDiv.textContent = `You lost ₹${bet}. Better luck next time!`;
+    }
+
+    updateBalance();
+
+    if(balance <= 0) {
+      resultDiv.textContent += ' Your balance is zero. Please refresh to try again.';
+      betInput.disabled = true;
+    }
+  }
+</script>
+
+</body>
+</html>
